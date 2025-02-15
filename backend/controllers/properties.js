@@ -46,8 +46,6 @@ const searchProperties = async (req, res) => {
   }
 };
 
-module.exports = searchProperties;
-
 const getLocations = async (req, res) => {
   try {
     const locations = await Properties.distinct("location");
@@ -58,4 +56,4 @@ const getLocations = async (req, res) => {
   }
 };
 
-module.exports = getLocations;
+module.exports = { searchProperties, getLocations };

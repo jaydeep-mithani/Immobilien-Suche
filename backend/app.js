@@ -5,6 +5,7 @@ const express = require("express");
 const path = require("path");
 const logger = require("morgan");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 var indexRouter = require("./routes/index");
 
@@ -14,6 +15,25 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Check if the origin is in the allowedOrigins array
+      if (
+        [
+          process.env.CORS_ALLOWED_ORIGIN_LOCAL,
+          process.env.CORS_ALLOWED_ORIGIN_DEPLOYMENT,
+        ].indexOf(origin) !== -1 ||
+        !origin
+      ) {
+        callback(null, true); // Allow the request
+      } else {
+        callback(new Error("Not allowed by CORS")); // Reject the request
+      }
+    },
+  })
+);
 
 // database connection
 mongoose

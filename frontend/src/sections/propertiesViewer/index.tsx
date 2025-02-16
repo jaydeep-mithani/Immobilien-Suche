@@ -95,7 +95,7 @@ const PropertiesViewer = () => {
     fetchProperties();
   }, [pageNumber, fetchProperties]);
 
-  const updatePropertyFilter = (newFilter: {}) => {
+  const updatePropertyFilter = (newFilter: { [key: string]: unknown }) => {
     setPropertyFilter((prev) => ({
       ...prev,
       ...newFilter,

@@ -66,33 +66,36 @@ const PropertiesViewer = () => {
     })();
   }, []);
 
-  const fetchProperties = useCallback(async () => {
-    try {
-      setPropertiesLoading(true);
-      const res = await getProperties({
-        pageNumber,
-        pageSize,
-        ...propertyFilter,
-      });
-      setProperties(res.properties);
-      setTotalpages(res.totalPages);
-    } catch (err) {
-      console.error({ err });
-    } finally {
-      setPropertiesLoading(false);
-    }
-  }, [pageNumber, propertyFilter]);
+  const fetchProperties = useCallback(
+    async (page: number) => {
+      try {
+        setPropertiesLoading(true);
+        const res = await getProperties({
+          pageNumber: page,
+          pageSize,
+          ...propertyFilter,
+        });
+        setProperties(res.properties);
+        setTotalpages(res.totalPages);
+      } catch (err) {
+        console.error({ err });
+      } finally {
+        setPropertiesLoading(false);
+      }
+    },
+    [pageNumber, propertyFilter]
+  );
 
   useEffect(() => {
     if (filterChanged) {
       setPageNumber(1);
-      fetchProperties();
+      fetchProperties(1);
       setFilterChanged(false);
     }
   }, [fetchProperties]);
 
   useEffect(() => {
-    fetchProperties();
+    fetchProperties(pageNumber);
   }, [pageNumber, fetchProperties]);
 
   const updatePropertyFilter = (newFilter: { [key: string]: unknown }) => {

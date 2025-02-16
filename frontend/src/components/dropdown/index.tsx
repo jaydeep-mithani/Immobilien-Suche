@@ -27,7 +27,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 
   useEffect(() => {
     onItemChange(selectedValue);
-  }, [selectedValue]);
+  }, [selectedValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div

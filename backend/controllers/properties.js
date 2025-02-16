@@ -10,15 +10,18 @@ const searchProperties = async (req, res) => {
       type,
       priceRange,
       areaRange,
-      zimmer,
-    } = req.body;
+      zimmerRange,
+    } = req.query;
 
     const filter = {};
 
     if (location) filter.location = new RegExp(location, "i");
     if (category) filter.category = category;
     if (type) filter.type = type;
-    if (zimmer) filter.zimmer = zimmer;
+    if (zimmerRange) {
+      const [min, max] = zimmerRange.split("-").map(Number);
+      filter.zimmer = { $gte: min, $lte: max };
+    }
     if (priceRange) {
       const [minPrice, maxPrice] = priceRange.split("-").map(Number);
       filter.price = { $gte: minPrice, $lte: maxPrice };

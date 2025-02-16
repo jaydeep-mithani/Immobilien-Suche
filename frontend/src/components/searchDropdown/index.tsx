@@ -7,7 +7,7 @@ interface SearchableDropdownProps {
   options: string[];
   placeholder?: string;
   className?: string;
-  onItemChange?: Function;
+  onItemChange?: (selectedValue: string) => void;
 }
 
 const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
@@ -19,7 +19,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [query, setQuery] = useState("");
   const [filteredOptions, setFilteredOptions] = useState<string[]>(options);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState<string>("");
 
   useEffect(() => {
     setFilteredOptions(

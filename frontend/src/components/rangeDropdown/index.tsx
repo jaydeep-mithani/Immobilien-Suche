@@ -5,7 +5,7 @@ import { ChrevronDownIcon, EuroIcon } from "../icons";
 
 interface DropdownProps extends LabelHTMLAttributes<HTMLLabelElement> {
   label?: string;
-  onItemChange?: Function;
+  onItemChange?: (selectedValue: string) => void;
 }
 
 const RangeDropdown: React.FC<DropdownProps> = ({

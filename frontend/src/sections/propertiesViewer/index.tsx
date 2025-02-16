@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { getLocations, getProperties } from "@/api/services/propertiesService";
 import SearchableDropdown from "@/components/searchDropdown";
@@ -35,6 +35,8 @@ const PropertiesViewer = () => {
     areaRange: "",
     zimmerRange: "",
   });
+
+  const [filterChanged, setFilterChanged] = useState(false); // Track changes in filter
   const [properties, setProperties] = useState<
     Array<{
       _id: string;
@@ -61,44 +63,45 @@ const PropertiesViewer = () => {
     })();
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setPropertiesLoading(true);
-        const res = await getProperties({
-          pageNumber,
-          pageSize,
-          ...propertyFilter,
-        });
-        setProperties(res.properties);
-        setTotalpages(res.totalPages);
-      } catch (err) {
-        console.error({ err });
-      } finally {
-        setPropertiesLoading(false);
-      }
-    })();
-  }, [pageNumber]);
+  // Handle property fetch on filter change
+  const fetchProperties = useCallback(async () => {
+    try {
+      setPropertiesLoading(true);
+      const res = await getProperties({
+        pageNumber,
+        pageSize,
+        ...propertyFilter,
+      });
+      setProperties(res.properties);
+      setTotalpages(res.totalPages);
+    } catch (err) {
+      console.error({ err });
+    } finally {
+      setPropertiesLoading(false);
+    }
+  }, [pageNumber, propertyFilter]);
 
+  // Run fetch on filter change
   useEffect(() => {
-    (async () => {
-      try {
-        setPropertiesLoading(true);
-        const res = await getProperties({
-          pageNumber: 1,
-          pageSize,
-          ...propertyFilter,
-        });
-        setPageNumber(1);
-        setProperties(res.properties);
-        setTotalpages(res.totalPages);
-      } catch (err) {
-        console.error({ err });
-      } finally {
-        setPropertiesLoading(false);
-      }
-    })();
-  }, [propertyFilter]);
+    if (filterChanged) {
+      fetchProperties(); // Fetch properties when filter has changed
+      setFilterChanged(false); // Reset flag after fetch
+    }
+  }, [fetchProperties, filterChanged]);
+
+  // When page number changes, trigger property fetch
+  useEffect(() => {
+    fetchProperties();
+  }, [pageNumber, fetchProperties]);
+
+  // Effect that listens for any change in propertyFilter
+  const updatePropertyFilter = (newFilter: any) => {
+    setPropertyFilter((prev) => ({
+      ...prev,
+      ...newFilter,
+    }));
+    setFilterChanged(true); // Mark filter as changed to trigger fetch
+  };
 
   return (
     <div>
@@ -117,10 +120,16 @@ const PropertiesViewer = () => {
               className="col-span-8 md:col-span-4 xl:col-span-1"
               label="Category"
               options={categoryOptions}
-              onItemChange={(item: { label: string; value: string }) =>
+              onItemChange={(item: {
+                label: string | number;
+                value: string | number;
+              }) =>
                 setPropertyFilter((prev) => ({
                   ...prev,
-                  category: item.value.trim() === "na" ? "" : item.value,
+                  category:
+                    item.value.toString().trim() === "na"
+                      ? ""
+                      : item.value.toString(),
                 }))
               }
             />
@@ -128,10 +137,16 @@ const PropertiesViewer = () => {
               className="col-span-8 md:col-span-4 xl:col-span-1"
               label="Type"
               options={propertyTypeOptions}
-              onItemChange={(item: { label: string; value: string }) =>
+              onItemChange={(item: {
+                label: string | number;
+                value: string | number;
+              }) =>
                 setPropertyFilter((prev) => ({
                   ...prev,
-                  type: item.value.trim() === "na" ? "" : item.value,
+                  type:
+                    item.value.toString().trim() === "na"
+                      ? ""
+                      : item.value.toString(),
                 }))
               }
             />

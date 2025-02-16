@@ -6,7 +6,10 @@ import { ChrevronDownIcon } from "../icons";
 interface DropdownProps extends LabelHTMLAttributes<HTMLLabelElement> {
   options: Array<{ label: string | number; value: string | number }>;
   label?: string;
-  onItemChange?: Function;
+  onItemChange?: (selectedValue: {
+    label: string | number;
+    value: string | number;
+  }) => void;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({

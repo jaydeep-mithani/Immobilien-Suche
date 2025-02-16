@@ -95,7 +95,7 @@ const PropertiesViewer = () => {
     fetchProperties();
   }, [pageNumber, fetchProperties]);
 
-  const updatePropertyFilter = (newFilter: any) => {
+  const updatePropertyFilter = (newFilter: {}) => {
     setPropertyFilter((prev) => ({
       ...prev,
       ...newFilter,

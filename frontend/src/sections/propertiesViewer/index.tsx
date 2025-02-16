@@ -35,8 +35,6 @@ const PropertiesViewer = () => {
     areaRange: "",
     zimmerRange: "",
   });
-
-  const [filterChanged, setFilterChanged] = useState(false); // Track changes in filter
   const [properties, setProperties] = useState<
     Array<{
       _id: string;
@@ -55,15 +53,19 @@ const PropertiesViewer = () => {
   >([]);
 
   const [locations, setLocations] = useState<Array<string>>([]);
+  const [filterChanged, setFilterChanged] = useState(false); // Track changes in filter
 
   useEffect(() => {
     (async () => {
-      const res = await getLocations();
-      setLocations(res);
+      try {
+        const res = await getLocations();
+        setLocations(res);
+      } catch (error) {
+        console.error({ error });
+      }
     })();
   }, []);
 
-  // Handle property fetch on filter change
   const fetchProperties = useCallback(async () => {
     try {
       setPropertiesLoading(true);
@@ -81,26 +83,24 @@ const PropertiesViewer = () => {
     }
   }, [pageNumber, propertyFilter]);
 
-  // Run fetch on filter change
   useEffect(() => {
     if (filterChanged) {
-      fetchProperties(); // Fetch properties when filter has changed
-      setFilterChanged(false); // Reset flag after fetch
+      setPageNumber(1);
+      fetchProperties();
+      setFilterChanged(false);
     }
-  }, [fetchProperties, filterChanged]);
+  }, [fetchProperties]);
 
-  // When page number changes, trigger property fetch
   useEffect(() => {
     fetchProperties();
   }, [pageNumber, fetchProperties]);
 
-  // Effect that listens for any change in propertyFilter
   const updatePropertyFilter = (newFilter: any) => {
     setPropertyFilter((prev) => ({
       ...prev,
       ...newFilter,
     }));
-    setFilterChanged(true); // Mark filter as changed to trigger fetch
+    setFilterChanged(true);
   };
 
   return (
@@ -113,7 +113,7 @@ const PropertiesViewer = () => {
               placeholder="Berlin, Germany"
               options={locations}
               onItemChange={(item: string) =>
-                setPropertyFilter((prev) => ({ ...prev, location: item }))
+                updatePropertyFilter({ location: item })
               }
             />
             <Dropdown
@@ -124,13 +124,12 @@ const PropertiesViewer = () => {
                 label: string | number;
                 value: string | number;
               }) =>
-                setPropertyFilter((prev) => ({
-                  ...prev,
+                updatePropertyFilter({
                   category:
                     item.value.toString().trim() === "na"
                       ? ""
                       : item.value.toString(),
-                }))
+                })
               }
             />
             <Dropdown
@@ -141,43 +140,39 @@ const PropertiesViewer = () => {
                 label: string | number;
                 value: string | number;
               }) =>
-                setPropertyFilter((prev) => ({
-                  ...prev,
+                updatePropertyFilter({
                   type:
                     item.value.toString().trim() === "na"
                       ? ""
                       : item.value.toString(),
-                }))
+                })
               }
             />
             <RangeDropdown
               className="col-span-8 md:col-span-4 xl:col-span-1"
               label="Price"
               onItemChange={(item: string) =>
-                setPropertyFilter((prev) => ({
-                  ...prev,
+                updatePropertyFilter({
                   priceRange: item.trim() === "0-0" ? "" : item.trim(),
-                }))
+                })
               }
             />
             <RangeDropdown
               className="col-span-8 md:col-span-4 xl:col-span-1"
               label="Area"
               onItemChange={(item: string) =>
-                setPropertyFilter((prev) => ({
-                  ...prev,
+                updatePropertyFilter({
                   areaRange: item.trim() === "0-0" ? "" : item.trim(),
-                }))
+                })
               }
             />
             <RangeDropdown
               className="col-span-8 md:col-span-4 xl:col-span-1"
               label="Zimmer"
               onItemChange={(item: string) =>
-                setPropertyFilter((prev) => ({
-                  ...prev,
+                updatePropertyFilter({
                   zimmerRange: item.trim() === "0-0" ? "" : item.trim(),
-                }))
+                })
               }
             />
           </div>

@@ -5,7 +5,7 @@ import { ChrevronDownIcon } from "../icons";
 interface PageSwitchProps extends HTMLProps<HTMLDivElement> {
   currentPage: number;
   totalPages: number;
-  onPageChange?: Function;
+  onPageChange?: (page: number) => void;
 }
 
 const PageSwitch: React.FC<PageSwitchProps> = ({
